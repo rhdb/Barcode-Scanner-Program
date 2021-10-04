@@ -8,6 +8,8 @@
 # total_time() [same as above]
 #
 import scanTimer
+import os
+import sys
 
 
 # Import dependencies and set up sheet:
@@ -33,15 +35,23 @@ data = sheet.get_all_records()
 student_id = int(input("Student ID: "))
 
 #Scanned Before?
-trackingTime=False
 index = 0
+
+
 
 for entry in data:
   if entry['Person ID'] == student_id:
     #if trackingTime==True:
     index = data.index(entry)
     break
-    
+    #timeTracker = open("times.txt", "w")
+   # listTimes = timeTracker.readlines()
+    #print(listTimes+"yes?")
+   # if listTimes[student_id]=="yes":
+   #   print("It works!")
+   # else:
+   #   listTimes[student_id]="yes"
+   #   timeTracker.writelines(listTimes)
     #elif not trackingTime:
      # trackingTime=True
      # startingTime=datetime.datetime.now()
