@@ -8,9 +8,8 @@
 # total_time() [same as above]
 #
 import scanTimer
-import os
-import sys
-
+import datetime
+import json 
 
 # Import dependencies and set up sheet:
 import gspread
@@ -28,44 +27,43 @@ sheet_name = "Weight Room Spreadsheet"
 
 sheet = client.open(sheet_name).sheet1 
 
-# Get sheet:
 data = sheet.get_all_records()
-
 # Find the student based on their ID:
-student_id = int(input("Student ID: "))
 
-#Scanned Before?
 index = 0
+#Tracking Dictionaries 
+trackingDict = {}
+
+for row in data:
+  trackingDict[row['Person ID']] = [False, 0]
 
 
+running = True
 
-for entry in data:
-  if entry['Person ID'] == student_id:
-    #if trackingTime==True:
-    index = data.index(entry)
-    break
-    #timeTracker = open("times.txt", "w")
-   # listTimes = timeTracker.readlines()
-    #print(listTimes+"yes?")
-   # if listTimes[student_id]=="yes":
-   #   print("It works!")
-   # else:
-   #   listTimes[student_id]="yes"
-   #   timeTracker.writelines(listTimes)
-    #elif not trackingTime:
-     # trackingTime=True
-     # startingTime=datetime.datetime.now()
-     # startingTime="{}".format(startingTime)
-     # startingHour1= startingTime[10:13]
-     # startingMin1 = startingTime[14:16]
-     # startingHour1=int(startingHour1)-6
+while running == True:
+  currentTime = datetime.datetime.now()
+  currentTime = "{}".format(currentTime)
 
-    # There should never be an instance in which the student ID isn't found because we are scraping the google sheet and there isn't a way for a student ID to be entered incorrectly.
-  
-index += 2
-  # Update the student's total hours:
+  ## We need to iterate through the dictionary and put the conditional below in the loop.
+  for id in trackingDict:
+    if trackingDict[id][0] == True:
+      if int(currentTime[11:13]) - int(trackingDict[id][1]) >=3:
+        trackingDict[id] = [False, 0]
+    
+  student_id = int(input("Student ID: "))
 
-workout_hours = 1 # Change this value accordingly.
-total_hours = sheet.cell(index,4).value 
-
-sheet.update_cell(index, 4, int(total_hours) + workout_hours)
+  for entry in data:
+    if entry['Person ID'] == student_id:
+      if trackingDict[student_id][0] == False:
+        index = data.index(entry)
+        firstScan = datetime.datetime.now()
+        firstScan = "{}".format(firstScan)
+        startingHour = firstScan[11:13]
+        trackingDict[student_id][1] = startingHour
+        trackingDict[student_id][0] = True
+        
+        index += 2
+        # Update the student's total hours:
+        total_credits = sheet.cell(index, 4).value 
+        sheet.update_cell(index, 4, int(total_credits) + 1) 
+        break
